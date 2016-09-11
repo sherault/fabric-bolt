@@ -8,6 +8,9 @@ from crispy_forms.bootstrap import FormActions
 
 from fabric_bolt.projects import models
 from fabric_bolt.task_runners import backend
+import random
+import string
+from pprint import pprint
 
 
 class ProjectCreateForm(forms.ModelForm):
@@ -188,3 +191,47 @@ class StageUpdateForm(StageCreateForm):
         fields = [
             'name',
         ]
+
+
+class HooksCreateForm(forms.ModelForm):
+    button_prefix = "Create"
+
+    class Meta:
+        model = models.Hooks
+        fields = [
+            'name',
+            'branch',
+            'token',
+            'task',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'name',
+            'branch',
+            'token',
+            'task',
+            FormActions(
+                Submit('submit', '%s Hook' % self.button_prefix, css_class='button')
+            )
+        )
+
+        super(HooksCreateForm, self).__init__(*args, **kwargs)
+        self.fields['token'].initial = self.generateToken()
+        pprint(kwargs['instance'])
+        self.fields['task'].widget = forms.Select(choices=self.getTasks(kwargs['instance']))
+
+    def generateToken(self):
+        return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
+
+    def getTasks(self, hooks):
+        all_tasks = backend.get_fabric_tasks(hooks.project)
+        task_names = [(x[0], x[0]) for x in all_tasks]
+
+        return task_names
+
+
+class HooksUpdateForm(HooksCreateForm):
+    button_prefix = "Update"
+

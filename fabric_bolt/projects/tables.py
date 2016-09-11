@@ -131,6 +131,37 @@ class StageTable(PaginateTable):
             'actions',
         )
 
+class HooksTable(PaginateTable):
+
+    actions = ActionsColumn(
+        [
+            {
+                'title': '<i class="glyphicon glyphicon-pencil"></i>',
+                'url': 'projects_hooks_update',
+                'args': [tables.A('project_id'), tables.A('stage_id'), tables.A('pk')],
+                'attrs': {'data-toggle': 'tooltip', 'title': 'Edit Hook', 'data-delay': '{ "show": 300, "hide": 0 }'}
+            },
+            {
+                'title': '<i class="glyphicon glyphicon-trash"></i>',
+                'url': 'projects_hooks_delete',
+                'args': [tables.A('project_id'), tables.A('stage_id'), tables.A('pk')],
+                'attrs': {'data-toggle': 'tooltip', 'title': 'Delete Hook', 'data-delay': '{ "show": 300, "hide": 0 }'}
+            },
+        ],
+        delimiter='&#160;&#160;&#160;'
+    )
+
+    name = tables.LinkColumn('projects_hooks_update', args=[tables.A('project_id'), tables.A('stage_id'), tables.A('pk')], verbose_name='Name')
+    deployments = tables.Column(accessor='deployment_count', verbose_name='# Deployments', order_by='deployment_count')
+
+    class Meta:
+        model = models.Hooks
+        attrs = {"class": "table table-striped"}
+        sequence = fields = (
+            'name',
+            'deployments',
+            'actions',
+        )
 
 class DeploymentTable(PaginateTable):
     """Table used to show the deployments

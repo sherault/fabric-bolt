@@ -25,7 +25,7 @@ install_requires = [
     'virtualenv==15.0.0',
     'channels==0.9.5',
     'autobahn==0.12.1',
-    'twisted==15.5.0',
+    'twisted==16.4.0',
     'six==1.10.0',
     'ansiconv==1.0.0',
 ]

@@ -6,9 +6,11 @@
         <li><a href="{% url 'projects_project_list' %}">Projects</a></li>
         <li><a href="{% url 'projects_project_view' project.pk %}">{{ project.name }}</a></li>
         <li><a href="{% url 'projects_stage_list' project.pk %}">Stages</a></li>
-        {% block stage_breadcrumb_links %}
-            <li class="active">{{ stage.name }}</li>
-        {% endblock stage_breadcrumb_links %}
+        <li><a href="{% url 'projects_stage_view' project.pk stage.pk %}">{{ stage.name }}</a></li>
+        <li><a href="{% url 'projects_stage_hooks' project.pk stage.pk %}">Hooks</a></li>
+        {% block hooks_breadcrumb_links %}
+        <li class="active">{{ hook.name }}</li>
+        {% endblock hooks_breadcrumb_links %}
     </ol>
 {% endblock breadcrumb %}
 
@@ -25,22 +27,12 @@
                 </li>
                 <li>
                     <a href="{% url 'projects_stage_view' project.pk stage.pk %}">
-                        <i class="glyphicon glyphicon-dashboard"></i> &#160;&#160;&#160;Stage
+                        Stage Dashboard &#160;&#160;&#160;<i class="glyphicon glyphicon-arrow-up"></i>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'projects_stage_hooks' project.pk stage.pk %}">
-                        <i class="glyphicon glyphicon-circle-arrow-down"></i> &#160;&#160;&#160;Hooks
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'projects_stage_configuration_list' project.pk stage.pk %}">
-                        <i class="glyphicon glyphicon-cog"></i> &#160;&#160;&#160;Configuration
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'projects_stage_deployment_list' project.pk stage.pk %}">
-                        <i class="glyphicon glyphicon-play"></i> &#160;&#160;&#160;Deployments
+                        Hooks List &#160;&#160;&#160;<i class="glyphicon glyphicon-circle-arrow-down"></i>
                     </a>
                 </li>
             </ul>

@@ -16,7 +16,7 @@ def full_domain_validator(hostname):
         - Only characters 'a' through 'z' (in a case-insensitive manner), the digits '0' through '9'.
         - Labels can't start or end with a hyphen.
     """
-    HOSTNAME_LABEL_PATTERN = re.compile("(?!-)[A-Z\d-]+(?<!-)$", re.IGNORECASE)
+    HOSTNAME_LABEL_PATTERN = re.compile("(?!-)[A-Z\d-]+(?::\d+)?(?<!-)$", re.IGNORECASE)
 
     if not hostname:
         return

@@ -1,0 +1,13 @@
+{% extends 'projects/hooks_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block hooks_breadcrumb_links %}
+    <li class="active">Update {{ hook.name }}</li>
+{% endblock hooks_breadcrumb_links %}
+
+{% block content %}
+    <h1>Hooks Update</h1>
+
+    {% crispy form %}
+
+{% endblock %}

@@ -185,6 +185,7 @@ FABFILE_PATH = os.path.join(os.path.dirname(PROJECT_DIR), 'fabfile.py')
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/'
 STRONGHOLD_PUBLIC_NAMED_URLS = (
+    'projects_deployment_hooks_output',
     'password_reset',
     'password_reset_done',
     'password_reset_complete',

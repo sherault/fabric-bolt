@@ -26,6 +26,13 @@ urlpatterns = [
     url(r'^(?P<project_id>\w+)/stage/(?P<stage_id>\d+)/deployment/(?P<pk>\d+)/$', views.DeploymentDetail.as_view(), name='projects_deployment_detail'),
     url(r'^(?P<project_id>\w+)/stage/(?P<stage_id>\d+)/deployment/(?P<pk>\d+)/', include(task_runners.backend.get_urls())),
 
+    url(r'^(?P<project_id>\w+)/stage/(?P<stage_id>\d+)/hooks/$', views.ProjectStageHooks.as_view(), name='projects_stage_hooks'),
+    url(r'^(?P<project_id>\w+)/stage/(?P<stage_id>\d+)/hooks/create/$', views.ProjectStageHooksCreate.as_view(), name='projects_hooks_create'),
+    url(r'^(?P<project_id>\w+)/stage/(?P<stage_id>\d+)/hooks/(?P<pk>\d+)/update/$', views.ProjectStageHooksUpdate.as_view(), name='projects_hooks_update'),
+    url(r'^(?P<project_id>\w+)/stage/(?P<stage_id>\d+)/hooks/(?P<pk>\d+)/delete/$', views.ProjectStageHooksDelete.as_view(), name='projects_hooks_delete'),
+    url(r'^(?P<project_id>\w+)/stage/(?P<stage_id>\d+)/hooks/(?P<pk>\d+)/$', views.ProjectStageHooksDetail.as_view(), name='projects_stage_hooks_detail'),
+    url(r'^hooks/(?P<stage_id>\d+)/(?P<token>\w+)/', include(task_runners.hooks.get_urls())),
+
     url(r'^(?P<project_id>\w+)/stage/$', views.ProjectStageList.as_view(), name='projects_stage_list'),
     url(r'^(?P<project_id>\w+)/stage/create/$', views.ProjectStageCreate.as_view(), name='projects_stage_create'),
     url(r'^(?P<project_id>\w+)/stage/(?P<pk>\w+)/$', views.ProjectStageView.as_view(), name='projects_stage_view'),

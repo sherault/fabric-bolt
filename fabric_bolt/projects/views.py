@@ -8,7 +8,7 @@ from copy import deepcopy
 from django.http import HttpResponseRedirect
 from django.db.models.aggregates import Count
 from django.contrib import messages
-from django.views.generic import CreateView, UpdateView, DetailView, DeleteView, RedirectView
+from django.views.generic import CreateView, UpdateView, DetailView, DeleteView, RedirectView, ListView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404
 from django.forms import CharField, PasswordInput, Select, FloatField, BooleanField
@@ -535,6 +535,80 @@ class ProjectStageView(ProjectSubPageMixin, DetailView):
         context['hosts'] = host_table
 
         context['available_hosts'] = Host.objects.exclude(id__in=[host.pk for host in stage_hosts]).all()
+
+        return context
+
+
+class ProjectStageHooks(StageSubPageMixin, SingleTableView):
+
+    table_class = tables.HooksTable
+    model = models.Hooks
+
+    def get_queryset(self):
+        print self.request.session
+        return self.stage.get_hooks().annotate(deployment_count=Count('deployment'))
+
+
+class ProjectStageHooksCreate(MultipleGroupRequiredMixin, StageSubPageMixin, CreateView):
+    """
+    Create/Add a Stage to a Project
+    """
+    group_required = ['Admin', ]
+    model = models.Hooks
+    template_name_suffix = '_create'
+    form_class = forms.HooksCreateForm
+
+    def form_valid(self, form):
+        """Set the project on this configuration after it's valid"""
+
+        self.object = form.save(commit=False)
+        self.object.stage = self.stage
+        self.object.project = self.project
+        self.object.save()
+
+        # Good to make note of that
+        messages.add_message(self.request, messages.SUCCESS, 'Hook %s created' % self.object.name)
+
+        return super(ProjectStageHooksCreate, self).form_valid(form)
+
+
+class ProjectStageHooksUpdate(MultipleGroupRequiredMixin, StageSubPageMixin, UpdateView):
+    """
+    Project Stage Hooks Update form
+    """
+    group_required = ['Admin', 'Deployer', ]
+    model = models.Hooks
+    template_name_suffix = '_update'
+    form_class = forms.HooksUpdateForm
+
+
+class ProjectStageHooksDelete(MultipleGroupRequiredMixin, StageSubPageMixin, DeleteView):
+    """
+    Delete a stage hooks
+    """
+    group_required = ['Admin', ]
+    model = models.Hooks
+
+    def dispatch(self, request, *args, **kwargs):
+        return super(ProjectStageHooksDelete, self).dispatch(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.date_deleted = datetime.datetime.now()
+        self.object.save()
+
+        messages.add_message(request, messages.WARNING, 'Hook {} Successfully Deleted'.format(self.object))
+        return HttpResponseRedirect(reverse('projects_stage_hooks', args=(self.object.project.pk, self.object.stage.pk,)))
+
+
+class ProjectStageHooksDetail(StageSubPageMixin, UpdateView):
+
+    model = models.Hooks
+
+    def get_context_data(self, **kwargs):
+
+        context = super(ProjectStageHooksDetail, self).get_context_data(**kwargs)
+        print self.request.session
 
         return context
 

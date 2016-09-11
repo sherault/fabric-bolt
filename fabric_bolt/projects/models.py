@@ -64,7 +64,6 @@ class Project(TrackingFields):
         ret = self.stage_set.annotate(num_deployments=Count('deployment')).aggregate(total_deployments=Sum('num_deployments'))
         return ret['total_deployments']
 
-
 class Stage(TrackingFields):
     project = models.ForeignKey(Project)
     name = models.CharField(max_length=255)
@@ -150,6 +149,36 @@ class Stage(TrackingFields):
 
         # Return the updated configurations
         return project_configurations_dictionary
+
+    def get_hooks(self):
+        return Hooks.active_records.filter(stage=self)
+
+
+class Hooks(TrackingFields):
+
+    stage = models.ForeignKey(Stage)
+    project = models.ForeignKey(Project)
+    name = models.CharField(max_length=255)
+    branch = models.CharField(max_length=255)
+    token = models.CharField(max_length=255)
+    task = models.CharField(max_length=255, default="test_env")
+
+    # Managers
+    objects = models.Manager()
+    active_records = ActiveManager()
+    # End Managers
+
+    def __unicode__(self):
+        return self.name
+
+    def get_stage(self):
+
+        return Hooks.active_records.filter(stage=self.stage)
+
+    def get_absolute_url(self):
+        """Hooks are show on a stage hooks page so that's where we're sending you to see them"""
+
+        return reverse('projects_stage_hooks', args=(self.project.pk, self.stage.pk,))
 
 
 class Configuration(TrackingFields):
@@ -269,6 +298,7 @@ class Deployment(TrackingFields):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     stage = models.ForeignKey(Stage)
+    hook = models.ForeignKey(Hooks, null=True, default=None)
     comments = models.TextField()
     status = models.CharField(choices=STATUS, max_length=10, default=PENDING)
     output = models.TextField(null=True, blank=True)
